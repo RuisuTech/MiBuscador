@@ -1,4 +1,4 @@
-# BuscadorWeb
+# MiBuscador
 
 Página web con buscador integrado que redirige las consultas a Google. Cuenta con un fondo visual y diseño responsive.
 
