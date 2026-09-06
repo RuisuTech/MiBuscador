@@ -1,0 +1,300 @@
+/* ========================================
+   MI BUSCADOR
+   Paleta: Océano (RuisuKit)
+   ======================================== */
+
+:root {
+    --bg: #0a0f1a;
+    --text: #f1f5f9;
+    --text-muted: #94a3b8;
+    --accent: #3b82f6;
+    --cyan: #22d3ee;
+    --gradient: linear-gradient(135deg, #3b82f6 0%, #22d3ee 50%, #38bdf8 100%);
+    --input-bg: rgba(17, 24, 39, 0.8);
+    --input-border: #1e3a5f;
+    --input-focus: #3b82f6;
+    --font: 'Inter', system-ui, sans-serif;
+}
+
+[data-theme="light"] {
+    --bg: #f8fafc;
+    --text: #0f172a;
+    --text-muted: #475569;
+    --input-bg: rgba(255, 255, 255, 0.9);
+    --input-border: #cbd5e1;
+    --input-focus: #3b82f6;
+}
+
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    height: 100%;
+    overflow: hidden;
+    font-family: var(--font);
+    background: var(--bg);
+    transition: background 0.5s ease;
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#bgImage {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.5s ease;
+}
+
+.bg-fade {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 15, 26, 0.6);
+    z-index: 0;
+    transition: background 0.5s ease;
+}
+
+[data-theme="light"] .overlay {
+    background: rgba(248, 250, 252, 0.5);
+}
+
+.content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    width: 100%;
+    z-index: 1;
+}
+
+.logo {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    margin-bottom: 0.5rem;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.tagline {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+}
+
+.search-form {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 6px;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    backdrop-filter: blur(12px);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-form:focus-within {
+    border-color: var(--input-focus);
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+}
+
+.search-form input[type="text"] {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    font-family: var(--font);
+    background: transparent;
+    color: var(--text);
+    border-radius: 9999px;
+}
+
+.search-form input[type="text"]::placeholder {
+    color: var(--text-muted);
+}
+
+.search-form button {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 9999px;
+    background: var(--gradient);
+    color: var(--bg);
+    font-size: 0.875rem;
+    font-weight: 600;
+    font-family: var(--font);
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.2s;
+}
+
+.search-form button:hover {
+    opacity: 0.9;
+    transform: scale(1.02);
+}
+
+/* Theme Toggle */
+.toolbar {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 10;
+}
+
+.toolbar__btn {
+    position: relative;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 1rem;
+    backdrop-filter: blur(12px);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toolbar__btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-1px);
+}
+
+.toolbar__icon {
+    font-size: 1rem;
+    line-height: 1;
+    transition: transform 0.3s ease;
+}
+
+.toolbar__btn:hover .toolbar__icon {
+    transform: scale(1.1);
+}
+
+.toolbar__tooltip {
+    position: absolute;
+    right: calc(100% + 10px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--bg-card);
+    border: 1px solid var(--input-border);
+    color: var(--text);
+    font-size: 0.75rem;
+    font-family: var(--font);
+    padding: 6px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    transform: translateY(-50%) translateX(5px);
+}
+
+.toolbar__tooltip::after {
+    content: '';
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 5px solid transparent;
+    border-left-color: var(--input-border);
+}
+
+.toolbar__btn:hover .toolbar__tooltip {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+}
+
+.toolbar__btn--upload:hover {
+    border-color: var(--cyan);
+    color: var(--cyan);
+}
+
+/* Shortcuts */
+.shortcuts {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 1.5rem;
+    z-index: 10;
+}
+
+.shortcut {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    transition: color 0.2s;
+}
+
+.shortcut:hover {
+    color: var(--text);
+}
+
+.shortcut__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    backdrop-filter: blur(12px);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.shortcut:hover .shortcut__icon {
+    border-color: var(--accent);
+    box-shadow: 0 0 15px rgba(59, 130, 246, 0.15);
+}
+
+@media (max-width: 768px) {
+    .search-form {
+        max-width: 90%;
+    }
+    
+    .shortcuts {
+        gap: 1rem;
+    }
+    
+    .shortcut__icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+}

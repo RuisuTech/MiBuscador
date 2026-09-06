@@ -3,95 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MiBuscador</title>
+    <meta name="theme-color" content="#0a0f1a">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        .video-container {
-            position: relative;
-            width: 100%;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        #myVideo {
-            position: absolute;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-            object-fit: cover; /* Ajusta el video para que cubra todo el contenedor */
-        }
-
-        .content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            width: 100%;
-            z-index: 1; /* Asegura que el contenido esté por encima del video */
-        }
-
-        .search-form {
-            max-width: 600px; /* Ajusta el ancho máximo del formulario de búsqueda */
-            margin: 0 auto;
-            padding: 20px;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-        }
-
-        .search-form input[type="text"] {
-            margin-top: 50%;
-            flex: 1;
-            padding: 10px;
-            border: none;
-            outline: none;
-            font-size: 18px;
-            border-radius: 5px;
-        }
-
-        /* Estilos adicionales para hacer el video responsive */
-        @media (max-width: 768px) {
-            .search-form {
-                max-width: 90%;
-            }
-        }
-    </style>
+    <title>MiBuscador</title>
 </head>
 <body>
     <div class="video-container">
-        <img id="myVideo" src="PixelYelanLite.png" alt="Fondo">
+        <img id="bgImage" src="PixelYelanLite.png" alt="Fondo">
+        <img id="bgFade" class="bg-fade" src="" alt="">
+        <div class="overlay"></div>
         <div class="content">
-            <!-- Barra de búsqueda -->
-            <form class="search-form" action="https://www.google.com/search" method="GET" target="_blank">
-                <input type="text" id="searchInput" name="q" placeholder="Buscar.." autocomplete="off" required>
+            <h1 class="logo">MiBuscador</h1>
+            <p class="tagline">Busca lo que quieras</p>
+            <form class="search-form" id="searchForm">
+                <input type="text" id="searchInput" placeholder="Buscar en Google..." autocomplete="off" required>
+                <button type="submit">Buscar</button>
             </form>
         </div>
     </div>
 
+    <div class="shortcuts">
+        <a href="https://www.youtube.com" target="_blank" class="shortcut">
+            <div class="shortcut__icon">▶</div>
+            <span>YouTube</span>
+        </a>
+        <a href="https://github.com" target="_blank" class="shortcut">
+            <div class="shortcut__icon">⌨</div>
+            <span>GitHub</span>
+        </a>
+        <a href="https://chat.openai.com" target="_blank" class="shortcut">
+            <div class="shortcut__icon">✦</div>
+            <span>ChatGPT</span>
+        </a>
+        <a href="https://twitter.com" target="_blank" class="shortcut">
+            <div class="shortcut__icon">𝕏</div>
+            <span>Twitter</span>
+        </a>
+    </div>
+
+    <div class="toolbar">
+        <button class="toolbar__btn" id="theme-toggle" aria-label="Cambiar tema">
+            <span class="toolbar__icon">☀️</span>
+            <span class="toolbar__tooltip">Tema</span>
+        </button>
+        <label class="toolbar__btn toolbar__btn--upload" for="bg-input" aria-label="Cambiar fondo">
+            <span class="toolbar__icon">🖼</span>
+            <span class="toolbar__tooltip">Cambiar fondo</span>
+            <input type="file" id="bg-input" accept="image/*" hidden>
+        </label>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            var searchForm = document.querySelector('.search-form');
-            var searchInput = document.getElementById('searchInput');
+            const toggle = document.getElementById('theme-toggle');
+            const toggleIcon = toggle.querySelector('.toolbar__icon');
+            const root = document.documentElement;
+            const bgInput = document.getElementById('bg-input');
+            const bgImage = document.getElementById('bgImage');
+            const searchForm = document.getElementById('searchForm');
+            const searchInput = document.getElementById('searchInput');
 
+            // Theme
+            const savedTheme = localStorage.getItem('mi-buscador-theme');
+            const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme) {
+                root.setAttribute('data-theme', savedTheme);
+            } else if (!systemDark) {
+                root.setAttribute('data-theme', 'light');
+            }
+            
+            toggleIcon.textContent = root.getAttribute('data-theme') === 'light' ? '🌙' : '☀️';
+            
+            toggle.addEventListener('click', () => {
+                const current = root.getAttribute('data-theme');
+                const next = current === 'dark' ? 'light' : 'dark';
+                root.setAttribute('data-theme', next);
+                localStorage.setItem('mi-buscador-theme', next);
+                toggleIcon.textContent = next === 'dark' ? '☀️' : '🌙';
+            });
+
+            // Background
+            const bgFade = document.getElementById('bgFade');
+            const savedBg = localStorage.getItem('mi-buscador-bg');
+            
+            if (savedBg) {
+                bgImage.src = savedBg;
+            }
+            
+            bgInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        bgFade.src = ev.target.result;
+                        bgFade.style.opacity = '1';
+                        
+                        setTimeout(() => {
+                            bgImage.src = ev.target.result;
+                            bgFade.style.opacity = '0';
+                        }, 500);
+                        
+                        localStorage.setItem('mi-buscador-bg', ev.target.result);
+                    };
+                    reader.readAsDataURL(file);
+                }
+                bgInput.value = '';
+            });
+
+            // Search
             searchForm.addEventListener('submit', function(event) {
-                event.preventDefault(); // Evita que el formulario se envíe
-
-                var searchTerm = searchInput.value.trim(); // Obtén el término de búsqueda y elimina espacios en blanco al inicio y al final
-
+                event.preventDefault();
+                const searchTerm = searchInput.value.trim();
                 if (searchTerm !== '') {
-                    // Realiza la acción de búsqueda aquí (en este caso, abre una nueva pestaña con Google)
-                    var searchUrl = 'https://www.google.com/search?q=' + encodeURIComponent(searchTerm);
-                    window.open(searchUrl, '_blank');
-
-                    // Borra el campo de búsqueda después de realizar la búsqueda
+                    window.open('https://www.google.com/search?q=' + encodeURIComponent(searchTerm), '_blank');
                     searchInput.value = '';
                 }
             });
